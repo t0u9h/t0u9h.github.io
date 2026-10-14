@@ -72,6 +72,7 @@
             padding: 10px 12px; 
             border-radius: 10px; 
             gap: 10px;
+            height: 52px; /* Единая высота для всех карточек */
         }
 
         .file-info {
@@ -91,7 +92,6 @@
             text-overflow: ellipsis;
         }
 
-        /* Векторная иконка Shadowrocket */
         .sr-logo {
             width: 28px;
             height: 28px;
@@ -106,23 +106,26 @@
             height: 24px;
         }
 
-        .actions { display: flex; flex-shrink: 0; }
+        /* Общие правила для всех кнопок справой стороны */
+        .btn-common {
+            width: 100px; /* Фиксированная одинаковая ширина */
+            height: 34px; /* Фиксированная одинаковая высота */
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-shrink: 0;
+            transition: opacity 0.2s, background 0.2s;
+        }
 
         .btn-action { 
             background: #0284c7; 
             color: #fff; 
-            padding: 8px 14px; 
-            border-radius: 8px; 
-            text-decoration: none; 
-            font-size: 12px; 
-            font-weight: 600; 
-            display: inline-flex; 
-            align-items: center; 
-            gap: 6px; 
-            transition: background 0.2s; 
             border: none;
-            cursor: pointer;
-            white-space: nowrap;
         }
 
         .btn-action:hover { background: #0369a1; }
@@ -130,16 +133,6 @@
         .btn-appstore {
             background: #f8fafc;
             color: #0f172a;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: opacity 0.2s;
-            white-space: nowrap;
         }
 
         .btn-appstore:hover { opacity: 0.9; }
@@ -155,14 +148,13 @@
             .body { padding: 12px 10px; }
             .file-row { padding: 8px; }
             .file-name { font-size: 11px; }
-            .btn-action, .btn-appstore { font-size: 11px; padding: 6px 10px; }
+            .btn-common { width: 88px; height: 30px; font-size: 10px; }
             .sr-logo { width: 24px; height: 24px; }
             .sr-logo svg { width: 20px; height: 20px; }
         }
     </style>
 </head>
 <body>
-    <!-- Глобальный градиент для ракеты -->
     <svg style="width:0;height:0;position:absolute;" aria-hidden="true" focusable="false">
       <linearGradient id="sr-icon-grad" x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stop-color="#38bdf8" />
@@ -171,7 +163,6 @@
     </svg>
 
     <div class="terminal-window">
-        <!-- Шапка окна -->
         <div class="titlebar">
             <div class="dots">
                 <span class="dot dot-red"></span>
@@ -183,12 +174,10 @@
         </div>
 
         <div class="body">
-            <!-- Командная строка -->
             <div class="cmd-line">
                 <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./fetch_configs.sh
             </div>
 
-            <!-- Список элементов -->
             <div class="file-list">
                 <!-- App Store -->
                 <div class="file-row">
@@ -196,7 +185,7 @@
                         <i class="fa-brands fa-apple" style="font-size: 22px; color: #f8fafc; width: 28px; text-align: center; flex-shrink: 0;"></i>
                         <span class="file-name" style="color: #38bdf8;">App Store</span>
                     </div>
-                    <a href="https://apps.apple.com/ru/app/shadowrocket/id932747118" target="_blank" class="btn-appstore">
+                    <a href="https://apps.apple.com/ru/app/shadowrocket/id932747118" target="_blank" class="btn-common btn-appstore">
                         <i class="fa-brands fa-apple"></i> Get App
                     </a>
                 </div>
@@ -213,9 +202,9 @@
                         </div>
                         <span class="file-name">config_1.1.conf</span>
                     </div>
-                    <div class="actions">
-                        <a href="sub://https://t0u9h.github.io/config1.1.conf" class="btn-action"><i class="fa-solid fa-bolt"></i> sub://</a>
-                    </div>
+                    <a href="sub://https://t0u9h.github.io/config1.1.conf" class="btn-common btn-action">
+                        <i class="fa-solid fa-bolt"></i> sub://
+                    </a>
                 </div>
 
                 <!-- Config 1.2 -->
@@ -230,9 +219,9 @@
                         </div>
                         <span class="file-name">config_1.2.conf</span>
                     </div>
-                    <div class="actions">
-                        <a href="sub://https://t0u9h.github.io/config1.2.conf" class="btn-action"><i class="fa-solid fa-bolt"></i> sub://</a>
-                    </div>
+                    <a href="sub://https://t0u9h.github.io/config1.2.conf" class="btn-common btn-action">
+                        <i class="fa-solid fa-bolt"></i> sub://
+                    </a>
                 </div>
             </div>
 
