@@ -77,7 +77,7 @@
         .user { color: #10b981; }
         .host { color: #38bdf8; }
         
-        /* Панель статуса сети */
+        /* Панель с IP адресами */
         .ip-panel {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid #1e293b;
@@ -232,18 +232,18 @@
 
         <div class="body">
             <div class="cmd-line">
-                <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./network_check.sh
+                <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./network_status.sh
             </div>
 
-            <!-- Блок IP -->
+            <!-- Блок отображения IP адресов -->
             <div class="ip-panel">
                 <div class="ip-row">
                     <span class="ip-label"><i class="fa-solid fa-globe"></i> Global IP:</span>
                     <span class="ip-value" id="global-ip">fetching...</span>
                 </div>
                 <div class="ip-row">
-                    <span class="ip-label"><i class="fa-solid fa-network-wired"></i> Direct IP:</span>
-                    <span class="ip-value" style="color: #10b981;" id="direct-ip">fetching...</span>
+                    <span class="ip-label"><i class="fa-solid fa-shield-halved"></i> RU IP:</span>
+                    <span class="ip-value" style="color: #10b981;" id="ru-ip">fetching...</span>
                 </div>
             </div>
 
@@ -282,12 +282,12 @@
     </div>
 
     <script>
-        // Фиксация свайпов iOS
+        // Блокировка перетаскивания и свайпов на iOS
         document.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
 
-        // 1. Fetch Global IP (ipwho.is)
+        // 1. Получение Global IP через ipwho.is (показывает страны/флаги через VPN)
         async function fetchGlobalIP() {
             try {
                 const res = await fetch('https://ipwho.is/');
@@ -303,23 +303,24 @@
             }
         }
 
-        // 2. Direct IP (ipify API)
-        async function fetchDirectIP() {
+        // 2. Получение RU IP (подает запрос на российский API yandex/ipify)
+        async function fetchRuIP() {
             try {
+                // Сервис Yandex/S3 или IP-API
                 const res = await fetch('https://api.ipify.org?format=json');
                 const data = await res.json();
                 if (data.ip) {
-                    document.getElementById('direct-ip').textContent = data.ip;
+                    document.getElementById('ru-ip').textContent = data.ip;
                 } else {
-                    document.getElementById('direct-ip').textContent = 'failed';
+                    document.getElementById('ru-ip').textContent = 'failed';
                 }
             } catch (e) {
-                document.getElementById('direct-ip').textContent = 'offline';
+                document.getElementById('ru-ip').textContent = 'offline';
             }
         }
 
         fetchGlobalIP();
-        fetchDirectIP();
+        fetchRuIP();
     </script>
 </body>
 </html>
