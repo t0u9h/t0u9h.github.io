@@ -77,7 +77,7 @@
         .user { color: #10b981; }
         .host { color: #38bdf8; }
         
-        /* Панель с IP адресами */
+        /* Панель статуса сети */
         .ip-panel {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid #1e293b;
@@ -232,18 +232,18 @@
 
         <div class="body">
             <div class="cmd-line">
-                <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./network_status.sh
+                <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./network_check.sh
             </div>
 
             <!-- Блок IP -->
             <div class="ip-panel">
                 <div class="ip-row">
                     <span class="ip-label"><i class="fa-solid fa-globe"></i> Global IP:</span>
-                    <span class="ip-value" id="global-ip">loading...</span>
+                    <span class="ip-value" id="global-ip">fetching...</span>
                 </div>
                 <div class="ip-row">
-                    <span class="ip-label"><i class="fa-solid fa-shield-halved"></i> RU IP (2whois):</span>
-                    <span class="ip-value" style="color: #10b981;" id="ru-ip">loading...</span>
+                    <span class="ip-label"><i class="fa-solid fa-network-wired"></i> Direct IP:</span>
+                    <span class="ip-value" style="color: #10b981;" id="direct-ip">fetching...</span>
                 </div>
             </div>
 
@@ -282,7 +282,7 @@
     </div>
 
     <script>
-        // Блокировка прокрутки
+        // Фиксация свайпов iOS
         document.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
@@ -299,29 +299,27 @@
                     document.getElementById('global-ip').textContent = 'failed';
                 }
             } catch (e) {
-                document.getElementById('global-ip').textContent = 'offline/blocked';
+                document.getElementById('global-ip').textContent = 'offline';
             }
         }
 
-        // 2. Fetch RU IP (2whois.ru)
-        async function fetchRuIP() {
+        // 2. Direct IP (ipify API)
+        async function fetchDirectIP() {
             try {
-                const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://2whois.ru/my-ip/'));
-                const html = await res.text();
-                // Поиск IP в коде страницы 2whois
-                const match = html.match(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/);
-                if (match) {
-                    document.getElementById('ru-ip').textContent = match[0];
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                if (data.ip) {
+                    document.getElementById('direct-ip').textContent = data.ip;
                 } else {
-                    document.getElementById('ru-ip').textContent = 'not found';
+                    document.getElementById('direct-ip').textContent = 'failed';
                 }
             } catch (e) {
-                document.getElementById('ru-ip').textContent = 'unreachable';
+                document.getElementById('direct-ip').textContent = 'offline';
             }
         }
 
         fetchGlobalIP();
-        fetchRuIP();
+        fetchDirectIP();
     </script>
 </body>
 </html>
