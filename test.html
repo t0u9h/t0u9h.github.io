@@ -77,7 +77,7 @@
         .user { color: #10b981; }
         .host { color: #38bdf8; }
         
-        /* Плашка со статусом IP */
+        /* Расширенная панель тестирования IP */
         .ip-panel {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid #1e293b;
@@ -232,18 +232,26 @@
 
         <div class="body">
             <div class="cmd-line">
-                <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./network_status.sh
+                <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./test_providers.sh
             </div>
 
-            <!-- Блок IP -->
+            <!-- Блок проверки нескольких источников -->
             <div class="ip-panel">
                 <div class="ip-row">
-                    <span class="ip-label"><i class="fa-solid fa-globe"></i> Global IP:</span>
-                    <span class="ip-value" id="global-ip">fetching...</span>
+                    <span class="ip-label"><i class="fa-solid fa-globe"></i> Global (ipwho.is):</span>
+                    <span class="ip-value" id="ip-global">fetching...</span>
                 </div>
                 <div class="ip-row">
-                    <span class="ip-label"><i class="fa-solid fa-shield-halved"></i> RU IP:</span>
-                    <span class="ip-value" style="color: #10b981;" id="ru-ip">fetching...</span>
+                    <span class="ip-label"><i class="fa-solid fa-shield-halved"></i> Domengood:</span>
+                    <span class="ip-value" style="color: #10b981;" id="ip-domengood">fetching...</span>
+                </div>
+                <div class="ip-row">
+                    <span class="ip-label"><i class="fa-solid fa-shield-halved"></i> Sreg.ru:</span>
+                    <span class="ip-value" style="color: #10b981;" id="ip-sreg">fetching...</span>
+                </div>
+                <div class="ip-row">
+                    <span class="ip-label"><i class="fa-solid fa-shield-halved"></i> Smit.ru:</span>
+                    <span class="ip-value" style="color: #10b981;" id="ip-smit">fetching...</span>
                 </div>
             </div>
 
@@ -282,44 +290,75 @@
     </div>
 
     <script>
-        // Блокировка жесткого скролла на iOS
         document.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
 
-        // 1. Global IP (ipwho.is)
-        async function fetchGlobalIP() {
+        // 1. Global IP
+        async function checkGlobal() {
             try {
                 const res = await fetch('https://ipwho.is/');
                 const data = await res.json();
                 if (data.success) {
                     const flag = data.flag && data.flag.img ? `<img src="${data.flag.img}" class="flag-img" alt="flag"> ` : '';
-                    document.getElementById('global-ip').innerHTML = `${flag}${data.ip} (${data.country_code || ''})`;
+                    document.getElementById('ip-global').innerHTML = `${flag}${data.ip}`;
                 } else {
-                    document.getElementById('global-ip').textContent = 'failed';
+                    document.getElementById('ip-global').textContent = 'err';
                 }
             } catch (e) {
-                document.getElementById('global-ip').textContent = 'offline';
+                document.getElementById('ip-global').textContent = 'off';
             }
         }
 
-        // 2. RU IP (nekoip.ru/api)
-        async function fetchRuIP() {
+        // 2. RU - Domengood
+        async function checkDomengood() {
             try {
-                const res = await fetch('https://nekoip.ru/api');
+                const res = await fetch('https://domengood.ru/api/ip/');
                 const data = await res.json();
-                if (data.ip) {
-                    document.getElementById('ru-ip').textContent = data.ip;
+                if (data && data.ip) {
+                    document.getElementById('ip-domengood').textContent = data.ip;
                 } else {
-                    document.getElementById('ru-ip').textContent = 'failed';
+                    document.getElementById('ip-domengood').textContent = 'err';
                 }
             } catch (e) {
-                document.getElementById('ru-ip').textContent = 'offline';
+                document.getElementById('ip-domengood').textContent = 'CORS/off';
             }
         }
 
-        fetchGlobalIP();
-        fetchRuIP();
+        // 3. RU - Sreg
+        async function checkSreg() {
+            try {
+                const res = await fetch('https://ip.sreg.ru/json');
+                const data = await res.json();
+                if (data && data.ip) {
+                    document.getElementById('ip-sreg').textContent = data.ip;
+                } else {
+                    document.getElementById('ip-sreg').textContent = 'err';
+                }
+            } catch (e) {
+                document.getElementById('ip-sreg').textContent = 'CORS/off';
+            }
+        }
+
+        // 4. RU - Smit
+        async function checkSmit() {
+            try {
+                const res = await fetch('https://ip.smit.ru');
+                const text = await res.text();
+                if (text && text.trim()) {
+                    document.getElementById('ip-smit').textContent = text.trim();
+                } else {
+                    document.getElementById('ip-smit').textContent = 'err';
+                }
+            } catch (e) {
+                document.getElementById('ip-smit').textContent = 'CORS/off';
+            }
+        }
+
+        checkGlobal();
+        checkDomengood();
+        checkSreg();
+        checkSmit();
     </script>
 </body>
 </html>
