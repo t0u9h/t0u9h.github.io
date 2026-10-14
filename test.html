@@ -5,79 +5,154 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>shadowrocket // t0u9h</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; }
-        body { background: #0b0f19; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
         
-        /* Окно терминала */
-        .terminal-window { width: 100%; max-width: 460px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); }
+        body { 
+            background: #0b0f19; 
+            color: #f8fafc; 
+            min-height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 16px; 
+        }
         
-        /* Шапка окна Linux / macOS */
-        .titlebar { background: #1e293b; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; }
+        .terminal-window { 
+            width: 100%; 
+            max-width: 440px; 
+            background: #0f172a; 
+            border: 1px solid #334155; 
+            border-radius: 16px; 
+            overflow: hidden; 
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); 
+        }
+        
+        .titlebar { 
+            background: #1e293b; 
+            padding: 12px 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            border-bottom: 1px solid #334155; 
+        }
+
         .dots { display: flex; gap: 8px; }
-        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot { width: 11px; height: 11px; border-radius: 50%; }
         .dot-red { background: #ef4444; }
         .dot-yellow { background: #f59e0b; }
         .dot-green { background: #10b981; }
-        .window-title { font-size: 12px; color: #94a3b8; font-weight: 600; }
+        .window-title { font-size: 11px; color: #94a3b8; font-weight: 600; }
         
-        .body { padding: 24px; }
-        .cmd-line { margin-bottom: 16px; font-size: 13px; }
-        .user { color: #10b981; font-weight: 600; }
-        .host { color: #38bdf8; font-weight: 600; }
+        .body { padding: 20px 16px; }
+        .cmd-line { margin-bottom: 16px; font-size: 12px; font-weight: 500; }
+        .user { color: #10b981; }
+        .host { color: #38bdf8; }
         
-        .file-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
-        .file-row { display: flex; align-items: center; justify-content: space-between; background: #1e293b; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px; font-size: 13px; }
-        .file-name { color: #38bdf8; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .file-list { display: flex; flex-direction: column; gap: 10px; }
         
-        /* Фирменная иконка Shadowrocket */
-        .sr-icon-small {
-            width: 24px;
-            height: 24px;
-            background: linear-gradient(135deg, #0055ff, #00d2ff);
-            border-radius: 6px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 12px;
-            flex-shrink: 0;
-            box-shadow: 0 2px 6px rgba(0, 85, 255, 0.4);
+        .file-row { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            background: #1e293b; 
+            border: 1px solid #334155; 
+            padding: 10px 12px; 
+            border-radius: 10px; 
+            gap: 10px;
         }
 
-        /* Кнопки управления */
-        .btn-cli { background: #0284c7; color: #fff; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
-        .btn-cli:hover { background: #0369a1; transform: translateY(-1px); }
-        .btn-outline { background: transparent; border: 1px solid #475569; color: #94a3b8; }
-        .btn-outline:hover { border-color: #38bdf8; color: #38bdf8; }
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
 
-        /* Стилизованная кнопка App Store */
-        .btn-appstore-cli {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid #334155;
-            color: #f8fafc;
+        .file-name { 
+            color: #f8fafc; 
+            font-weight: 600; 
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Точный SVG Логотип Shadowrocket (Синяя иконка с ракетой) */
+        .sr-logo {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #1c72ecee, #0b50b8);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(11, 80, 184, 0.4);
+        }
+
+        .sr-logo svg {
+            width: 16px;
+            height: 16px;
+            fill: #ffffff;
+        }
+
+        /* Кнопки действий */
+        .actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+        .btn-action { 
+            background: #0284c7; 
+            color: #fff; 
+            padding: 6px 10px; 
+            border-radius: 6px; 
+            text-decoration: none; 
+            font-size: 11px; 
+            font-weight: 600; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 4px; 
+            transition: background 0.2s; 
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-action:hover { background: #0369a1; }
+
+        .btn-icon-only { 
+            background: transparent; 
+            border: 1px solid #475569; 
+            color: #94a3b8; 
+            padding: 6px 9px;
+        }
+
+        .btn-icon-only:hover { 
+            border-color: #38bdf8; 
+            color: #38bdf8; 
+            background: rgba(56, 189, 248, 0.05);
+        }
+
+        .btn-appstore {
+            background: #f8fafc;
+            color: #0f172a;
             padding: 6px 12px;
             border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
             text-decoration: none;
-            font-size: 12px;
-            font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: all 0.2s;
+            transition: opacity 0.2s;
         }
-        .btn-appstore-cli:hover {
-            border-color: #f8fafc;
-            background: rgba(255, 255, 255, 0.12);
-        }
-        
-        footer { margin-top: 20px; text-align: center; font-size: 11px; color: #475569; }
+
+        .btn-appstore:hover { opacity: 0.9; }
+
+        footer { margin-top: 18px; text-align: center; font-size: 11px; color: #475569; }
     </style>
 </head>
 <body>
     <div class="terminal-window">
-        <!-- Шапка окна -->
         <div class="titlebar">
             <div class="dots">
                 <span class="dot dot-red"></span>
@@ -85,46 +160,56 @@
                 <span class="dot dot-green"></span>
             </div>
             <span class="window-title">t0u9h@shw-node:~</span>
-            <div style="width: 40px;"></div>
+            <div style="width: 33px;"></div>
         </div>
 
         <div class="body">
-            <!-- Строка командной строки -->
             <div class="cmd-line">
                 <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./fetch_configs.sh
             </div>
 
-            <!-- Список файлов и приложений -->
             <div class="file-list">
                 <!-- App Store -->
                 <div class="file-row">
-                    <span class="file-name"><i class="fa-brands fa-apple" style="font-size: 18px; color: #f8fafc;"></i> App Store</span>
-                    <a href="https://apps.apple.com/ru/app/shadowrocket/id932747118" target="_blank" class="btn-appstore-cli">
-                        <span> Download</span>
+                    <div class="file-info">
+                        <i class="fa-brands fa-apple" style="font-size: 20px; color: #f8fafc; width: 28px; text-align: center;"></i>
+                        <span class="file-name" style="color: #38bdf8;">App Store</span>
+                    </div>
+                    <a href="https://apps.apple.com/ru/app/shadowrocket/id932747118" target="_blank" class="btn-appstore">
+                        <i class="fa-brands fa-apple"></i> Get App
                     </a>
                 </div>
 
                 <!-- Config 1.1 -->
                 <div class="file-row">
-                    <span class="file-name">
-                        <span class="sr-icon-small">🚀</span>
-                        config_1.1.conf
-                    </span>
-                    <div style="display: flex; gap: 6px;">
-                        <a href="config1.1.conf" download class="btn-cli btn-outline" title="Скачать файл"><i class="fa-solid fa-download"></i></a>
-                        <a href="sub://https://t0u9h.github.io/config1.1.conf" class="btn-cli"><i class="fa-solid fa-bolt"></i> sub://</a>
+                    <div class="file-info">
+                        <div class="sr-logo">
+                            <!-- Очищенный вектор оригинальной ракеты Shadowrocket -->
+                            <svg viewBox="0 0 24 24">
+                                <path d="M13.13 2.05a1.2 1.2 0 0 0-1.74 0L8.85 4.59a1.2 1.2 0 0 0-.28.43L6.8 9.34a1 1 0 0 0 .23 1.09l1.66 1.66a1 1 0 0 0 1.09.23l4.32-1.77a1.2 1.2 0 0 0 .43-.28l2.54-2.54a1.2 1.2 0 0 0 0-1.74l-3.94-3.94zM5.5 12.5l-2.8 1.4a1 1 0 0 0-.42 1.35l.8 1.6a1 1 0 0 0 1.15.48l2.42-.6 1.85-1.85-3-2.38zm13 3l-2.38-3-1.85 1.85-.6 2.42a1 1 0 0 0 .48 1.15l1.6.8a1 1 0 0 0 1.35-.42l1.4-2.8z"/>
+                            </svg>
+                        </div>
+                        <span class="file-name">config_1.1.conf</span>
+                    </div>
+                    <div class="actions">
+                        <a href="config1.1.conf" download class="btn-action btn-icon-only" title="Скачать .conf"><i class="fa-solid fa-download"></i></a>
+                        <a href="sub://https://t0u9h.github.io/config1.1.conf" class="btn-action"><i class="fa-solid fa-bolt"></i> sub://</a>
                     </div>
                 </div>
 
                 <!-- Config 1.2 -->
                 <div class="file-row">
-                    <span class="file-name">
-                        <span class="sr-icon-small">🚀</span>
-                        config_1.2.conf
-                    </span>
-                    <div style="display: flex; gap: 6px;">
-                        <a href="config1.2.conf" download class="btn-cli btn-outline" title="Скачать файл"><i class="fa-solid fa-download"></i></a>
-                        <a href="sub://https://t0u9h.github.io/config1.2.conf" class="btn-cli"><i class="fa-solid fa-bolt"></i> sub://</a>
+                    <div class="file-info">
+                        <div class="sr-logo">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M13.13 2.05a1.2 1.2 0 0 0-1.74 0L8.85 4.59a1.2 1.2 0 0 0-.28.43L6.8 9.34a1 1 0 0 0 .23 1.09l1.66 1.66a1 1 0 0 0 1.09.23l4.32-1.77a1.2 1.2 0 0 0 .43-.28l2.54-2.54a1.2 1.2 0 0 0 0-1.74l-3.94-3.94zM5.5 12.5l-2.8 1.4a1 1 0 0 0-.42 1.35l.8 1.6a1 1 0 0 0 1.15.48l2.42-.6 1.85-1.85-3-2.38zm13 3l-2.38-3-1.85 1.85-.6 2.42a1 1 0 0 0 .48 1.15l1.6.8a1 1 0 0 0 1.35-.42l1.4-2.8z"/>
+                            </svg>
+                        </div>
+                        <span class="file-name">config_1.2.conf</span>
+                    </div>
+                    <div class="actions">
+                        <a href="config1.2.conf" download class="btn-action btn-icon-only" title="Скачать .conf"><i class="fa-solid fa-download"></i></a>
+                        <a href="sub://https://t0u9h.github.io/config1.2.conf" class="btn-action"><i class="fa-solid fa-bolt"></i> sub://</a>
                     </div>
                 </div>
             </div>
