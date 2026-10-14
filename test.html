@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>shadowrocket // t0u9h</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'JetBrains Mono', monospace; }
+        body { background: #0b0f19; color: #f8fafc; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        
+        /* Окно терминала */
+        .terminal-window { width: 100%; max-width: 460px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7); }
+        
+        /* Шапка окна Linux / macOS */
+        .titlebar { background: #1e293b; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #334155; }
+        .dots { display: flex; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #ef4444; }
+        .dot-yellow { background: #f59e0b; }
+        .dot-green { background: #10b981; }
+        .window-title { font-size: 12px; color: #94a3b8; font-weight: 600; }
+        
+        .body { padding: 24px; }
+        .cmd-line { margin-bottom: 16px; font-size: 13px; }
+        .user { color: #10b981; font-weight: 600; }
+        .host { color: #38bdf8; font-weight: 600; }
+        
+        .file-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+        .file-row { display: flex; align-items: center; justify-content: space-between; background: #1e293b; border: 1px solid #334155; padding: 10px 12px; border-radius: 8px; font-size: 13px; }
+        .file-name { color: #38bdf8; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        
+        /* Фирменная иконка Shadowrocket */
+        .sr-icon-small {
+            width: 24px;
+            height: 24px;
+            background: linear-gradient(135deg, #0055ff, #00d2ff);
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 12px;
+            flex-shrink: 0;
+            box-shadow: 0 2px 6px rgba(0, 85, 255, 0.4);
+        }
+
+        /* Кнопки управления */
+        .btn-cli { background: #0284c7; color: #fff; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; }
+        .btn-cli:hover { background: #0369a1; transform: translateY(-1px); }
+        .btn-outline { background: transparent; border: 1px solid #475569; color: #94a3b8; }
+        .btn-outline:hover { border-color: #38bdf8; color: #38bdf8; }
+
+        /* Стилизованная кнопка App Store */
+        .btn-appstore-cli {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #334155;
+            color: #f8fafc;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .btn-appstore-cli:hover {
+            border-color: #f8fafc;
+            background: rgba(255, 255, 255, 0.12);
+        }
+        
+        footer { margin-top: 20px; text-align: center; font-size: 11px; color: #475569; }
+    </style>
+</head>
+<body>
+    <div class="terminal-window">
+        <!-- Шапка окна -->
+        <div class="titlebar">
+            <div class="dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+            </div>
+            <span class="window-title">t0u9h@shw-node:~</span>
+            <div style="width: 40px;"></div>
+        </div>
+
+        <div class="body">
+            <!-- Строка командной строки -->
+            <div class="cmd-line">
+                <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./fetch_configs.sh
+            </div>
+
+            <!-- Список файлов и приложений -->
+            <div class="file-list">
+                <!-- App Store -->
+                <div class="file-row">
+                    <span class="file-name"><i class="fa-brands fa-apple" style="font-size: 18px; color: #f8fafc;"></i> App Store</span>
+                    <a href="https://apps.apple.com/ru/app/shadowrocket/id932747118" target="_blank" class="btn-appstore-cli">
+                        <span> Download</span>
+                    </a>
+                </div>
+
+                <!-- Config 1.1 -->
+                <div class="file-row">
+                    <span class="file-name">
+                        <span class="sr-icon-small">🚀</span>
+                        config_1.1.conf
+                    </span>
+                    <div style="display: flex; gap: 6px;">
+                        <a href="config1.1.conf" download class="btn-cli btn-outline" title="Скачать файл"><i class="fa-solid fa-download"></i></a>
+                        <a href="sub://https://t0u9h.github.io/config1.1.conf" class="btn-cli"><i class="fa-solid fa-bolt"></i> sub://</a>
+                    </div>
+                </div>
+
+                <!-- Config 1.2 -->
+                <div class="file-row">
+                    <span class="file-name">
+                        <span class="sr-icon-small">🚀</span>
+                        config_1.2.conf
+                    </span>
+                    <div style="display: flex; gap: 6px;">
+                        <a href="config1.2.conf" download class="btn-cli btn-outline" title="Скачать файл"><i class="fa-solid fa-download"></i></a>
+                        <a href="sub://https://t0u9h.github.io/config1.2.conf" class="btn-cli"><i class="fa-solid fa-bolt"></i> sub://</a>
+                    </div>
+                </div>
+            </div>
+
+            <footer>© by t0u9h</footer>
+        </div>
+    </div>
+</body>
+</html>
