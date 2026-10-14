@@ -2,7 +2,6 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <!-- viewport-fit=cover убирает полосы у "челки" на iPhone -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>shadowrocket // t0u9h</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -12,25 +11,23 @@
             margin: 0; 
             padding: 0; 
             box-sizing: border-box; 
-            font-family: 'JetBrains Mono', monospace;
-            /* Отключаем выделение текста и перетаскивание */
+            font-family: 'JetBrains Mono', monospace; 
             -webkit-user-select: none;
             user-select: none;
             -webkit-user-drag: none;
             -webkit-touch-callout: none;
         }
         
-        /* Жесткая фиксация всего viewport */
         html, body {
             width: 100%;
             height: 100%;
             height: 100vh;
-            height: 100dvh; /* Учитывает динамическую высоту мобильного браузера */
+            height: 100dvh;
             overflow: hidden;
             position: fixed;
             top: 0;
             left: 0;
-            overscroll-behavior: none; /* Отключает пружинящий скролл в браузерах */
+            overscroll-behavior: none;
         }
 
         body { 
@@ -40,7 +37,7 @@
             align-items: center; 
             justify-content: center; 
             padding: 16px; 
-            touch-action: none; /* Отключает все свайпы и жесты по умолчанию */
+            touch-action: none; 
         }
         
         .terminal-window { 
@@ -69,10 +66,10 @@
         .dot-green { background: #10b981; }
         .window-title { font-size: 11px; color: #94a3b8; font-weight: 600; }
         
-        .body { padding: 20px 16px; }
+        .body { padding: 18px 16px; }
         
         .cmd-line { 
-            margin-bottom: 16px; 
+            margin-bottom: 14px; 
             font-size: 12px; 
             font-weight: 500; 
             word-break: break-word;
@@ -80,6 +77,45 @@
         .user { color: #10b981; }
         .host { color: #38bdf8; }
         
+        /* Блок статуса IP и Сети */
+        .ip-panel {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin-bottom: 14px;
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ip-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ip-label {
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ip-value {
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        .flag-img {
+            width: 16px;
+            height: 12px;
+            border-radius: 2px;
+            object-fit: cover;
+            vertical-align: middle;
+        }
+
         .file-list { display: flex; flex-direction: column; gap: 10px; }
         
         .file-row { 
@@ -139,7 +175,7 @@
             flex-shrink: 0;
             transition: opacity 0.2s, background 0.2s;
             cursor: pointer;
-            -webkit-tap-highlight-color: transparent; /* Убирает серый квадрат при тапе на iOS */
+            -webkit-tap-highlight-color: transparent;
         }
 
         .btn-action { 
@@ -158,7 +194,7 @@
         .btn-appstore:hover { opacity: 0.9; }
 
         footer { 
-            margin-top: 20px; 
+            margin-top: 16px; 
             text-align: center; 
             font-size: 11px; 
             color: #475569; 
@@ -171,6 +207,7 @@
             .btn-common { width: 88px; height: 30px; font-size: 10px; }
             .sr-logo { width: 24px; height: 24px; }
             .sr-logo svg { width: 20px; height: 20px; }
+            .ip-panel { font-size: 10px; }
         }
     </style>
 </head>
@@ -195,7 +232,23 @@
 
         <div class="body">
             <div class="cmd-line">
-                <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./fetch_configs.sh
+                <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./check_network.sh
+            </div>
+
+            <!-- Блок системной информации об IP -->
+            <div class="ip-panel">
+                <div class="ip-row">
+                    <span class="ip-label"><i class="fa-solid fa-globe"></i> Global IP (ipwho.is):</span>
+                    <span class="ip-value" id="global-ip">fetching...</span>
+                </div>
+                <div class="ip-row">
+                    <span class="ip-label"><i class="fa-solid fa-location-dot"></i> Location:</span>
+                    <span class="ip-value" id="global-loc">fetching...</span>
+                </div>
+                <div class="ip-row">
+                    <span class="ip-label"><i class="fa-solid fa-shield-halved"></i> RU Node (myip.ru):</span>
+                    <span class="ip-value" style="color: #10b981;" id="ru-ip">fetching...</span>
+                </div>
             </div>
 
             <div class="file-list">
@@ -232,11 +285,49 @@
         </div>
     </div>
 
-    <!-- Скрипт для блокировки bounce-эффекта и свайпов в iOS Safari -->
     <script>
+        // Блокировка тач-свайпов iOS
         document.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
+
+        // Fetch данных с ipwho.is
+        async function getGlobalIP() {
+            try {
+                const res = await fetch('https://ipwho.is/');
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('global-ip').textContent = data.ip;
+                    const flag = data.flag && data.flag.img ? `<img src="${data.flag.img}" class="flag-img" alt="flag"> ` : '';
+                    document.getElementById('global-loc').innerHTML = `${flag}${data.country_code || ''} (${data.city || data.country})`;
+                } else {
+                    document.getElementById('global-ip').textContent = 'error';
+                }
+            } catch (err) {
+                document.getElementById('global-ip').textContent = 'offline/blocked';
+                document.getElementById('global-loc').textContent = 'n/a';
+            }
+        }
+
+        // Fetch данных с myip.ru через CORS-прокси
+        async function getRuIP() {
+            try {
+                const res = await fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://myip.ru/'));
+                const html = await res.text();
+                // Парсим результат HTML от myip.ru
+                const match = html.match(/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/);
+                if (match) {
+                    document.getElementById('ru-ip').textContent = match[0];
+                } else {
+                    document.getElementById('ru-ip').textContent = 'check failed';
+                }
+            } catch (err) {
+                document.getElementById('ru-ip').textContent = 'unreachable';
+            }
+        }
+
+        getGlobalIP();
+        getRuIP();
     </script>
 </body>
 </html>
