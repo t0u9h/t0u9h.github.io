@@ -234,7 +234,6 @@
                 <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./network_status.sh
             </div>
 
-            <!-- Блок результатов -->
             <div class="ip-panel">
                 <div class="ip-row">
                     <span class="ip-label"><i class="fa-solid fa-globe"></i> Global IP:</span>
@@ -247,7 +246,6 @@
             </div>
 
             <div class="file-list">
-                <!-- App Store -->
                 <div class="file-row">
                     <div class="file-info">
                         <i class="fa-brands fa-apple" style="font-size: 22px; color: #f8fafc; width: 28px; text-align: center; flex-shrink: 0;"></i>
@@ -258,7 +256,6 @@
                     </a>
                 </div>
 
-                <!-- Config 1.2 -->
                 <div class="file-row">
                     <div class="file-info">
                         <div class="sr-logo">
@@ -301,10 +298,10 @@
             }
         }
 
-        // 2. RU IP via enterno.io (DIRECT)
+        // 2. RU IP via Enterno API v4 (DIRECT)
         async function fetchRuIP() {
             try {
-                const res = await fetch('https://enterno.io/api/ip');
+                const res = await fetch('https://enterno.io/api/v4/ip');
                 const data = await res.json();
                 if (data && (data.ip || data.query)) {
                     document.getElementById('ru-ip').textContent = data.ip || data.query;
