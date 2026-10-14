@@ -77,6 +77,7 @@
         .user { color: #10b981; }
         .host { color: #38bdf8; }
         
+        /* Плашка со статусом IP */
         .ip-panel {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid #1e293b;
@@ -231,7 +232,7 @@
 
         <div class="body">
             <div class="cmd-line">
-                <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./check_routing.sh
+                <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./network_status.sh
             </div>
 
             <!-- Блок IP -->
@@ -281,11 +282,12 @@
     </div>
 
     <script>
+        // Блокировка жесткого скролла на iOS
         document.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
 
-        // 1. Запрос Global IP (ipwho.is — идет через PROXY)
+        // 1. Global IP (ipwho.is)
         async function fetchGlobalIP() {
             try {
                 const res = await fetch('https://ipwho.is/');
@@ -301,18 +303,18 @@
             }
         }
 
-        // 2. Запрос RU IP (ip.smit.ru — должен идти через DIRECT)
+        // 2. RU IP (nekoip.ru/api)
         async function fetchRuIP() {
             try {
-                const res = await fetch('https://ip.smit.ru');
-                const ip = await res.text();
-                if (ip && ip.trim()) {
-                    document.getElementById('ru-ip').textContent = ip.trim();
+                const res = await fetch('https://nekoip.ru/api');
+                const data = await res.json();
+                if (data.ip) {
+                    document.getElementById('ru-ip').textContent = data.ip;
                 } else {
                     document.getElementById('ru-ip').textContent = 'failed';
                 }
             } catch (e) {
-                document.getElementById('ru-ip').textContent = 'offline/blocked';
+                document.getElementById('ru-ip').textContent = 'offline';
             }
         }
 
