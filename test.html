@@ -77,7 +77,6 @@
         .user { color: #10b981; }
         .host { color: #38bdf8; }
         
-        /* Панель с IP адресами */
         .ip-panel {
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid #1e293b;
@@ -232,10 +231,10 @@
 
         <div class="body">
             <div class="cmd-line">
-                <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./network_status.sh
+                <span class="user">t0u9h</span>@<span class="host">shw-node</span>:~$ ./check_routing.sh
             </div>
 
-            <!-- Блок отображения IP адресов -->
+            <!-- Блок IP -->
             <div class="ip-panel">
                 <div class="ip-row">
                     <span class="ip-label"><i class="fa-solid fa-globe"></i> Global IP:</span>
@@ -282,12 +281,11 @@
     </div>
 
     <script>
-        // Блокировка перетаскивания и свайпов на iOS
         document.addEventListener('touchmove', function(e) {
             e.preventDefault();
         }, { passive: false });
 
-        // 1. Получение Global IP через ipwho.is (показывает страны/флаги через VPN)
+        // 1. Запрос Global IP (ipwho.is — идет через PROXY)
         async function fetchGlobalIP() {
             try {
                 const res = await fetch('https://ipwho.is/');
@@ -303,19 +301,18 @@
             }
         }
 
-        // 2. Получение RU IP (подает запрос на российский API yandex/ipify)
+        // 2. Запрос RU IP (ip.smit.ru — должен идти через DIRECT)
         async function fetchRuIP() {
             try {
-                // Сервис Yandex/S3 или IP-API
-                const res = await fetch('https://api.ipify.org?format=json');
-                const data = await res.json();
-                if (data.ip) {
-                    document.getElementById('ru-ip').textContent = data.ip;
+                const res = await fetch('https://ip.smit.ru');
+                const ip = await res.text();
+                if (ip && ip.trim()) {
+                    document.getElementById('ru-ip').textContent = ip.trim();
                 } else {
                     document.getElementById('ru-ip').textContent = 'failed';
                 }
             } catch (e) {
-                document.getElementById('ru-ip').textContent = 'offline';
+                document.getElementById('ru-ip').textContent = 'offline/blocked';
             }
         }
 
