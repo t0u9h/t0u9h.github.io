@@ -106,12 +106,13 @@
       overflow-wrap: anywhere;
     }
 
+    /* Цвета IP-адресов под палитру */
     .ip-value-global {
-      color: #65d9ff;
+      color: #65d9ff; /* Неоново-голубой для Global IP */
     }
 
     .ip-value-direct {
-      color: #c084fc;
+      color: #c084fc; /* Лавандово-фиолетовый для Direct IP */
     }
 
     .country {
@@ -318,6 +319,7 @@
       }
     }
 
+    // Глобальный IP и страна через ipwho.is
     async function getGlobalIp() {
       const data = await fetchJson("https://ipwho.is/");
 
@@ -331,16 +333,32 @@
       };
     }
 
+    // Прямой IP
     async function getDirectIp() {
-      const data = await fetchJson("https://ipapi.ipgeo.ru/json/");
+      const data = await fetchJson("https://api.ipgeo.ru/");
 
-      if (!data || !data.ip) {
+      let ip;
+      let country = "Страна не определена";
+
+      if (typeof data === "string") {
+        ip = data.trim();
+      } else {
+        ip = data.ip || data.query || data.address;
+
+        country =
+          data.country ||
+          data.country_name ||
+          data.countryName ||
+          country;
+      }
+
+      if (!ip) {
         throw new Error("Прямой IP не найден");
       }
 
       return {
-        ip: data.ip,
-        country: data.country || data.country_name || "Россия"
+        ip: ip,
+        country: country
       };
     }
 
@@ -362,6 +380,7 @@
 
         if (results[0].status === "fulfilled") {
           const result = results[0].value;
+
           globalIpElement.textContent = result.ip;
           globalCountryElement.textContent = result.country;
         } else {
@@ -371,6 +390,7 @@
 
         if (results[1].status === "fulfilled") {
           const result = results[1].value;
+
           directIpElement.textContent = result.ip;
           directCountryElement.textContent = result.country;
         } else {
