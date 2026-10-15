@@ -14,48 +14,58 @@
     html,
     body {
       width: 100%;
-      min-height: 100%;
+      height: 100%;
       margin: 0;
+      overflow: hidden;
     }
 
     body {
-      background: #080d0b;
-      color: #b8ffd2;
-      font-family: monospace;
+      position: fixed;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
+      background: #080d0b;
+      color: #b8ffd2;
+      font-family: monospace;
     }
 
     .container {
       width: 100%;
       max-width: 440px;
+      max-height: 100%;
+      overflow: auto;
+      scrollbar-width: none;
       border: 1px solid #174b35;
       border-radius: 12px;
-      padding: 24px;
+      padding: 22px;
       background: #0b120e;
       box-shadow: 0 0 25px rgba(0, 255, 128, 0.06);
+    }
+
+    .container::-webkit-scrollbar {
+      display: none;
     }
 
     .title {
       color: #43ff9a;
       font-size: 20px;
-      margin: 0 0 24px;
+      margin: 0 0 22px;
       overflow-wrap: anywhere;
-    }
-
-    .section-title {
-      color: #43ff9a;
-      font-size: 15px;
-      margin: 0 0 16px;
     }
 
     .status-box {
       border: 1px solid #174b35;
       border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 20px;
+      padding: 15px;
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      color: #43ff9a;
+      font-size: 14px;
+      margin: 0 0 16px;
     }
 
     .ip-row {
@@ -63,8 +73,9 @@
       justify-content: space-between;
       align-items: flex-start;
       gap: 12px;
-      margin: 12px 0;
-      font-size: 13px;
+      margin: 14px 0;
+      font-size: 12px;
+      line-height: 1.6;
     }
 
     .ip-label {
@@ -78,64 +89,79 @@
       overflow-wrap: anywhere;
     }
 
-    .refresh-button,
+    .country {
+      display: block;
+      color: #86b99b;
+      font-size: 11px;
+      margin-top: 3px;
+    }
+
+    button,
     .action-button {
       display: block;
       width: 100%;
-      padding: 13px;
+      min-height: 42px;
+      padding: 12px;
       border: 1px solid #23774d;
       border-radius: 7px;
       background: #10271a;
       color: #65ffad;
       font-family: monospace;
-      font-size: 14px;
+      font-size: 13px;
       text-align: center;
       text-decoration: none;
       cursor: pointer;
-      transition: background 0.2s, border-color 0.2s;
     }
 
-    .refresh-button:hover,
-    .action-button:hover {
-      background: #173b26;
-      border-color: #43ff9a;
+    .refresh-button {
+      margin-top: 16px;
     }
 
-    .refresh-button:disabled {
-      opacity: 0.6;
+    button:disabled {
+      opacity: 0.65;
       cursor: wait;
     }
 
     .last-check {
+      min-height: 14px;
       color: #668774;
-      font-size: 11px;
+      font-size: 10px;
       text-align: center;
-      margin: 12px 0 0;
+      margin: 10px 0 0;
     }
 
     .actions {
       display: grid;
-      gap: 12px;
+      gap: 10px;
     }
 
     footer {
       color: #426d53;
       text-align: center;
       font-size: 11px;
-      margin-top: 24px;
+      margin-top: 20px;
     }
 
-    @media (max-width: 360px) {
+    @media (max-height: 600px) {
       .container {
-        padding: 16px;
+        padding: 15px;
       }
 
       .title {
-        font-size: 17px;
+        margin-bottom: 14px;
+      }
+
+      .status-box {
+        padding: 12px;
+        margin-bottom: 12px;
       }
 
       .ip-row {
-        font-size: 12px;
+        margin: 9px 0;
+      }
+
+      footer {
+        margin-top: 12px;
       }
     }
   </style>
@@ -150,12 +176,18 @@
 
       <div class="ip-row">
         <span class="ip-label">Глобальный IP:</span>
-        <span class="ip-value" id="global-ip">Проверка...</span>
+        <span class="ip-value">
+          <span id="global-ip">Загрузка...</span>
+          <span class="country" id="global-country"></span>
+        </span>
       </div>
 
       <div class="ip-row">
         <span class="ip-label">Прямой IP:</span>
-        <span class="ip-value" id="direct-ip">Проверка...</span>
+        <span class="ip-value">
+          <span id="direct-ip">Загрузка...</span>
+          <span class="country" id="direct-country"></span>
+        </span>
       </div>
 
       <button class="refresh-button" id="refresh-button" type="button">
@@ -163,7 +195,7 @@
       </button>
 
       <p class="last-check" id="last-check">
-        Последняя проверка: ещё не выполнялась
+        Последняя проверка: —
       </p>
     </section>
 
@@ -188,67 +220,66 @@
 
   <script>
     const globalIpElement = document.getElementById("global-ip");
+    const globalCountryElement = document.getElementById("global-country");
     const directIpElement = document.getElementById("direct-ip");
+    const directCountryElement = document.getElementById("direct-country");
     const refreshButton = document.getElementById("refresh-button");
     const lastCheckElement = document.getElementById("last-check");
 
-    async function fetchWithTimeout(url, timeout = 7000) {
+    async function fetchJson(url, timeout = 7000) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeout);
 
       try {
-        return await fetch(url, {
+        const response = await fetch(url, {
           cache: "no-store",
           signal: controller.signal
         });
+
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        return await response.json();
       } finally {
         clearTimeout(timer);
       }
     }
 
     async function getGlobalIp() {
-      const response = await fetchWithTimeout("https://ipwho.is/");
-
-      if (!response.ok) {
-        throw new Error("Не удалось получить данные");
-      }
-
-      const data = await response.json();
+      const data = await fetchJson("https://ipwho.is/");
 
       if (!data.success || !data.ip) {
-        throw new Error("IP не найден");
+        throw new Error("IP недоступен");
       }
 
-      return data.ip;
+      return {
+        ip: data.ip,
+        country: data.country || "Страна не определена"
+      };
     }
 
     async function getDirectIp() {
-      const response = await fetchWithTimeout("https://api.ipgeo.ru/");
+      const data = await fetchJson("https://ipwho.is/");
 
-      if (!response.ok) {
-        throw new Error("Не удалось получить данные");
+      if (!data.success || !data.ip) {
+        throw new Error("IP недоступен");
       }
 
-      const data = await response.json();
-
-      if (typeof data === "string") {
-        return data.trim();
-      }
-
-      const ip = data.ip || data.query || data.address;
-
-      if (!ip) {
-        throw new Error("IP не найден");
-      }
-
-      return ip;
+      return {
+        ip: data.ip,
+        country: data.country || "Страна не определена"
+      };
     }
 
     async function updateData() {
       refreshButton.disabled = true;
-      refreshButton.textContent = "⟳ Проверка...";
+      refreshButton.textContent = "Проверка...";
+
       globalIpElement.textContent = "Проверка...";
+      globalCountryElement.textContent = "";
       directIpElement.textContent = "Проверка...";
+      directCountryElement.textContent = "";
 
       try {
         const results = await Promise.allSettled([
@@ -256,15 +287,21 @@
           getDirectIp()
         ]);
 
-        globalIpElement.textContent =
-          results[0].status === "fulfilled"
-            ? results[0].value
-            : "Недоступен";
+        if (results[0].status === "fulfilled") {
+          globalIpElement.textContent = results[0].value.ip;
+          globalCountryElement.textContent =
+            "🌍 " + results[0].value.country;
+        } else {
+          globalIpElement.textContent = "Недоступен";
+        }
 
-        directIpElement.textContent =
-          results[1].status === "fulfilled"
-            ? results[1].value
-            : "Недоступен";
+        if (results[1].status === "fulfilled") {
+          directIpElement.textContent = results[1].value.ip;
+          directCountryElement.textContent =
+            "🌍 " + results[1].value.country;
+        } else {
+          directIpElement.textContent = "Недоступен";
+        }
 
         lastCheckElement.textContent =
           "Последняя проверка: " +
@@ -276,7 +313,6 @@
     }
 
     refreshButton.addEventListener("click", updateData);
-
     updateData();
   </script>
 </body>
