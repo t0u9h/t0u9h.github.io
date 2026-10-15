@@ -298,7 +298,7 @@
                         </svg>
                         Global IP:
                     </span>
-                    <span class="ip-value" id="global-ip">fetching...</span>
+                    <span class="ip-value" id="global-ip">определяем...</span>
                 </div>
 
                 <div class="ip-row">
@@ -311,7 +311,7 @@
                     </span>
                     <span class="ip-value"
                           style="color:#10b981;"
-                          id="ru-ip">fetching...</span>
+                          id="ru-ip">определяем...</span>
                 </div>
             </div>
 
@@ -367,6 +367,20 @@
     </div>
 
     <script>
+        // Проверка IPv4
+        function isIPv4(ip) {
+            if (typeof ip !== 'string') return false;
+
+            const parts = ip.split('.');
+            if (parts.length !== 4) return false;
+
+            return parts.every(part =>
+                /^\d{1,3}$/.test(part) &&
+                Number(part) >= 0 &&
+                Number(part) <= 255
+            );
+        }
+
         // Global IP: ipwho.is
         async function fetchGlobalIP() {
             const el = document.getElementById('global-ip');
@@ -385,13 +399,16 @@
 
                 const data = await response.json();
 
-                if (!data.success || !data.ip) {
-                    throw new Error('IP unavailable');
-                }
+                if (data.success && isIPv4(data.ip)) {
+                    const country =
+                        data.country || data.country_code || 'страна не определена';
 
-                el.textContent =
-                    `${data.ip} (${data.country_code || '??'})`;
-                el.style.color = '#38bdf8';
+                    el.textContent = `${data.ip} (${country})`;
+                    el.style.color = '#38bdf8';
+                } else {
+                    el.textContent = 'IPv4 недоступен';
+                    el.style.color = '#f59e0b';
+                }
             } catch (error) {
                 el.textContent = 'offline';
                 el.style.color = '#ef4444';
@@ -423,14 +440,15 @@
 
                 const data = await response.json();
 
-                if (data && data.ok === true && data.ip) {
-                    el.textContent = data.ip;
+                if (data && data.ok === true && isIPv4(data.ip)) {
+                    const country = data.country || 'страна не определена';
+
+                    el.textContent = `${data.ip} (${country})`;
                     el.style.color =
                         data.country === 'RU' ? '#10b981' : '#f59e0b';
                 } else {
-                    throw new Error(
-                        data && data.err ? data.err : 'Invalid API response'
-                    );
+                    el.textContent = 'IPv4 недоступен';
+                    el.style.color = '#f59e0b';
                 }
             } catch (error) {
                 el.textContent = 'offline';
