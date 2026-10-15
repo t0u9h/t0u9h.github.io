@@ -92,16 +92,24 @@
     .ip-value {
       min-width: 0;
       min-height: 34px;
-      color: #e2e8f0;
       font-weight: 600;
       text-align: right;
       overflow-wrap: anywhere;
     }
 
+    /* Цвета IP-адресов под палитру */
+    .ip-value-global {
+      color: #65d9ff; /* Неоново-голубой для Global IP */
+    }
+
+    .ip-value-direct {
+      color: #c084fc; /* Лавандово-фиолетовый для Direct IP */
+    }
+
     .country {
       display: block;
       min-height: 16px;
-      color: #718096;
+      color: #a0aec0;
       font-size: 11px;
       margin-top: 3px;
       font-weight: normal;
@@ -225,7 +233,7 @@
 
       <div class="ip-row">
         <span class="ip-label">Глобальный IP:</span>
-        <span class="ip-value">
+        <span class="ip-value ip-value-global">
           <span id="global-ip">Загрузка...</span>
           <span class="country" id="global-country"></span>
         </span>
@@ -233,7 +241,7 @@
 
       <div class="ip-row">
         <span class="ip-label">Прямой IP:</span>
-        <span class="ip-value">
+        <span class="ip-value ip-value-direct">
           <span id="direct-ip">Загрузка...</span>
           <span class="country" id="direct-country"></span>
         </span>
