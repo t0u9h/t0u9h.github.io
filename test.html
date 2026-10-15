@@ -206,14 +206,18 @@
             border: none;
         }
 
-        .btn-action:hover { background: #0369a1; }
+        .btn-action:hover {
+            background: #0369a1;
+        }
 
         .btn-appstore {
             background: #f8fafc;
             color: #0f172a;
         }
 
-        .btn-appstore:hover { opacity: 0.9; }
+        .btn-appstore:hover {
+            opacity: 0.9;
+        }
 
         footer {
             margin-top: 16px;
@@ -223,23 +227,37 @@
         }
 
         @media (max-width: 360px) {
-            .body { padding: 12px 10px; }
-            .file-row { padding: 8px; }
-            .file-name { font-size: 11px; }
+            .body {
+                padding: 12px 10px;
+            }
+
+            .file-row {
+                padding: 8px;
+            }
+
+            .file-name {
+                font-size: 11px;
+            }
+
             .btn-common {
                 width: 88px;
                 height: 30px;
                 font-size: 10px;
             }
+
             .sr-logo {
                 width: 24px;
                 height: 24px;
             }
+
             .sr-logo svg {
                 width: 20px;
                 height: 20px;
             }
-            .ip-panel { font-size: 10px; }
+
+            .ip-panel {
+                font-size: 10px;
+            }
         }
     </style>
 </head>
@@ -349,17 +367,16 @@
     </div>
 
     <script>
-        document.addEventListener('touchmove', function (e) {
-            e.preventDefault();
-        }, { passive: false });
-
-        // 1. Global IP через ipwho.is
+        // Global IP: ipwho.is
         async function fetchGlobalIP() {
             const el = document.getElementById('global-ip');
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 7000);
 
             try {
                 const response = await fetch('https://ipwho.is/', {
-                    cache: 'no-store'
+                    cache: 'no-store',
+                    signal: controller.signal
                 });
 
                 if (!response.ok) {
@@ -368,28 +385,36 @@
 
                 const data = await response.json();
 
-                if (data.success && data.ip) {
-                    el.textContent =
-                        `${data.ip} (${data.country_code || '??'})`;
-                } else {
-                    el.textContent = 'failed';
+                if (!data.success || !data.ip) {
+                    throw new Error('IP unavailable');
                 }
+
+                el.textContent =
+                    `${data.ip} (${data.country_code || '??'})`;
+                el.style.color = '#38bdf8';
             } catch (error) {
                 el.textContent = 'offline';
+                el.style.color = '#ef4444';
+                console.error('Global IP error:', error);
+            } finally {
+                clearTimeout(timeout);
             }
         }
 
-        // 2. RU IP через ipgeo.ru
+        // RU IP: IPGeo API
         async function fetchRuIP() {
             const el = document.getElementById('ru-ip');
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 7000);
 
             try {
-                const response = await fetch('https://ipgeo.ru/api', {
+                const response = await fetch('https://api.ipgeo.ru/', {
                     method: 'GET',
-                    cache: 'no-store',
                     headers: {
                         'Accept': 'application/json'
-                    }
+                    },
+                    cache: 'no-store',
+                    signal: controller.signal
                 });
 
                 if (!response.ok) {
@@ -398,30 +423,21 @@
 
                 const data = await response.json();
 
-                // Поддержка распространённых форматов ответа.
-                let ip = null;
-
-                if (typeof data === 'string') {
-                    ip = data;
-                } else if (data && typeof data === 'object') {
-                    ip = data.ip
-                        || data.query
-                        || data.address
-                        || data.ip_address
-                        || data.data?.ip
-                        || data.result?.ip;
-                }
-
-                if (typeof ip === 'string' &&
-                    /^(?:\d{1,3}\.){3}\d{1,3}$/.test(ip)) {
-                    el.textContent = ip;
-                    el.style.color = '#10b981';
+                if (data && data.ok === true && data.ip) {
+                    el.textContent = data.ip;
+                    el.style.color =
+                        data.country === 'RU' ? '#10b981' : '#f59e0b';
                 } else {
-                    throw new Error('Unexpected API response');
+                    throw new Error(
+                        data && data.err ? data.err : 'Invalid API response'
+                    );
                 }
             } catch (error) {
                 el.textContent = 'offline';
                 el.style.color = '#ef4444';
+                console.error('RU IP error:', error);
+            } finally {
+                clearTimeout(timeout);
             }
         }
 
