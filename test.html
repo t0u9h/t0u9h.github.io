@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#080b10">
-  <meta name="description" content="Shadowrocket network status and configuration">
+  <meta name="description" content="Network status and Shadowrocket configuration">
 
-  <title>t0u9h@shw-node:~</title>
+  <title>t0u9h@shadowrocket:~</title>
 
   <style>
     :root {
@@ -39,8 +39,8 @@
       position: fixed;
       inset: 0;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       padding:
         max(12px, env(safe-area-inset-top))
         max(12px, env(safe-area-inset-right))
@@ -83,8 +83,8 @@
       color: var(--cyan);
       font-size: 12px;
       font-weight: 600;
-      text-transform: uppercase;
       letter-spacing: 1px;
+      text-transform: uppercase;
     }
 
     .ip-row {
@@ -142,8 +142,8 @@
       transition: border-color 0.2s, background 0.2s;
     }
 
-    .link:focus-visible,
-    .link:hover {
+    .link:hover,
+    .link:focus-visible {
       border-color: var(--cyan);
       background: #121c27;
       outline: none;
@@ -156,7 +156,6 @@
       text-align: center;
     }
 
-    /* Компактный режим для небольших экранов */
     @media (max-width: 360px) {
       .header {
         margin-bottom: 14px;
@@ -186,7 +185,6 @@
       }
     }
 
-    /* Компактный режим для экранов небольшой высоты */
     @media (max-height: 600px) {
       .header {
         margin-bottom: 10px;
@@ -231,7 +229,7 @@
 <body>
   <main class="container">
     <header class="header">
-      t0u9h@shw-node:~
+      t0u9h@shadowrocket:~
     </header>
 
     <section class="panel" aria-labelledby="network-title">
@@ -260,18 +258,18 @@
       </div>
     </section>
 
-    <nav class="links" aria-label="Ссылки">
+    <nav class="links" aria-label="Основные действия">
       <a
         class="link"
         href="https://apps.apple.com/ru/app/shadowrocket/id932747118"
         target="_blank"
         rel="noopener noreferrer"
-      >[ Download Shadowrocket ]</a>
+      >1. Установить shadowrocket</a>
 
       <a
         class="link"
         href="sub://https://t0u9h.github.io/config1.2.conf"
-      >[ Add subscription ]</a>
+      >2. Добавить подписку</a>
     </nav>
 
     <footer class="footer">
@@ -288,6 +286,7 @@
       {
         url: "https://ipwho.is/",
         elementId: "global-ip",
+
         parse(data) {
           if (data.success === false || !isValidIP(data.ip)) {
             throw new Error("Invalid response");
@@ -302,6 +301,7 @@
       {
         url: "https://api.ipgeo.ru/",
         elementId: "direct-ip",
+
         parse(data) {
           if (data.ok !== true || !isValidIP(data.ip)) {
             throw new Error("Invalid response");
@@ -350,6 +350,7 @@
     async function loadIP(service) {
       const element = document.getElementById(service.elementId);
       const controller = new AbortController();
+
       const timeout = setTimeout(
         () => controller.abort(),
         REQUEST_TIMEOUT
