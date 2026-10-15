@@ -305,12 +305,19 @@
             const el = document.getElementById('ru-ip');
             const apiKey = 'ent_dd02bd27037e0d9ab94b7019665b9ff457251b9290227179';
 
-            // Попытка 1: Через открытый роут enterno
+            // Попытка 1: Через API v4 с заголовком X-API-Key
             try {
-                const res = await fetch('https://enterno.io/api/open/ip');
+                const res = await fetch('https://enterno.io/api/v4/ip', {
+                    method: 'GET',
+                    headers: {
+                        'X-API-Key': apiKey,
+                        'Accept': 'application/json'
+                    }
+                });
+                
                 if (res.ok) {
                     const json = await res.json();
-                    const ip = json.ip || (json.data && json.data.ip) || json.query;
+                    const ip = (json.data && json.data.ip) || json.ip || json.query;
                     if (ip) {
                         el.textContent = ip;
                         return;
@@ -318,12 +325,12 @@
                 }
             } catch (e) {}
 
-            // Попытка 2: Через защищенный API v4 с ключом в параметре
+            // Попытка 2: Фолбек на открытый публичный роут без ключа
             try {
-                const res = await fetch(`https://enterno.io/api/v4/ip?key=${apiKey}`);
+                const res = await fetch('https://enterno.io/api/open/ip');
                 if (res.ok) {
                     const json = await res.json();
-                    const ip = (json.data && json.data.ip) || json.ip || json.query;
+                    const ip = json.ip || (json.data && json.data.ip) || json.query;
                     if (ip) {
                         el.textContent = ip;
                         return;
