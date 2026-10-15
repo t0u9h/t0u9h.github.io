@@ -26,6 +26,7 @@
 
         html, body {
             width: 100%;
+            min-height: 100%;
             height: 100%;
             height: 100vh;
             height: 100dvh;
@@ -49,6 +50,7 @@
         .terminal-window {
             width: 100%;
             max-width: 440px;
+            min-width: 0;
             background: #0f172a;
             border: 1px solid #334155;
             border-radius: 16px;
@@ -88,13 +90,14 @@
 
         .body {
             padding: 18px 16px;
+            min-width: 0;
         }
 
         .cmd-line {
             margin-bottom: 12px;
             font-size: 12px;
             font-weight: 500;
-            word-break: break-word;
+            overflow-wrap: anywhere;
         }
 
         .user { color: #10b981; }
@@ -109,14 +112,16 @@
             font-size: 11px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 10px;
+            min-width: 0;
         }
 
         .ip-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr);
+            align-items: start;
             gap: 10px;
+            min-width: 0;
         }
 
         .ip-label {
@@ -125,13 +130,21 @@
             align-items: center;
             gap: 6px;
             flex-shrink: 0;
+            white-space: nowrap;
+            padding-top: 2px;
         }
 
         .ip-value {
             color: #38bdf8;
             font-weight: 600;
             text-align: right;
+            min-width: 0;
+            max-width: 100%;
             overflow-wrap: anywhere;
+            word-break: normal;
+            line-height: 1.6;
+            font-size: 10px;
+            font-variant-numeric: tabular-nums;
         }
 
         .file-list {
@@ -149,6 +162,7 @@
             padding: 10px 12px;
             border-radius: 10px;
             gap: 10px;
+            min-width: 0;
             height: 52px;
         }
 
@@ -227,8 +241,25 @@
         }
 
         @media (max-width: 360px) {
+            body {
+                padding: 10px;
+            }
+
             .body {
                 padding: 12px 10px;
+            }
+
+            .ip-panel {
+                padding: 9px;
+                font-size: 10px;
+            }
+
+            .ip-row {
+                gap: 6px;
+            }
+
+            .ip-value {
+                font-size: 9px;
             }
 
             .file-row {
@@ -253,10 +284,6 @@
             .sr-logo svg {
                 width: 20px;
                 height: 20px;
-            }
-
-            .ip-panel {
-                font-size: 10px;
             }
         }
     </style>
@@ -298,6 +325,7 @@
                         </svg>
                         Global IP:
                     </span>
+
                     <span class="ip-value" id="global-ip">определяем...</span>
                 </div>
 
@@ -309,6 +337,7 @@
                         </svg>
                         RU IP:
                     </span>
+
                     <span class="ip-value"
                           style="color:#10b981;"
                           id="ru-ip">определяем...</span>
@@ -367,20 +396,6 @@
     </div>
 
     <script>
-        // Проверка IPv4
-        function isIPv4(ip) {
-            if (typeof ip !== 'string') return false;
-
-            const parts = ip.split('.');
-            if (parts.length !== 4) return false;
-
-            return parts.every(part =>
-                /^\d{1,3}$/.test(part) &&
-                Number(part) >= 0 &&
-                Number(part) <= 255
-            );
-        }
-
         // Global IP: ipwho.is
         async function fetchGlobalIP() {
             const el = document.getElementById('global-ip');
@@ -399,15 +414,14 @@
 
                 const data = await response.json();
 
-                if (data.success && isIPv4(data.ip)) {
+                if (data.success && data.ip) {
                     const country =
                         data.country || data.country_code || 'страна не определена';
 
                     el.textContent = `${data.ip} (${country})`;
                     el.style.color = '#38bdf8';
                 } else {
-                    el.textContent = 'IPv4 недоступен';
-                    el.style.color = '#f59e0b';
+                    throw new Error('IP unavailable');
                 }
             } catch (error) {
                 el.textContent = 'offline';
@@ -440,15 +454,16 @@
 
                 const data = await response.json();
 
-                if (data && data.ok === true && isIPv4(data.ip)) {
+                if (data && data.ok === true && data.ip) {
                     const country = data.country || 'страна не определена';
 
                     el.textContent = `${data.ip} (${country})`;
                     el.style.color =
                         data.country === 'RU' ? '#10b981' : '#f59e0b';
                 } else {
-                    el.textContent = 'IPv4 недоступен';
-                    el.style.color = '#f59e0b';
+                    throw new Error(
+                        data && data.err ? data.err : 'Invalid API response'
+                    );
                 }
             } catch (error) {
                 el.textContent = 'offline';
