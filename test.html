@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#080b10">
   <meta name="description" content="Shadowrocket network status and configuration">
 
@@ -25,42 +25,61 @@
       box-sizing: border-box;
     }
 
+    html,
     body {
+      width: 100%;
+      height: 100%;
       margin: 0;
-      min-height: 100vh;
-      padding: 24px 14px;
+      padding: 0;
+      overflow: hidden;
+      overscroll-behavior: none;
+    }
+
+    body {
+      position: fixed;
+      inset: 0;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
+      padding:
+        max(12px, env(safe-area-inset-top))
+        max(12px, env(safe-area-inset-right))
+        max(12px, env(safe-area-inset-bottom))
+        max(12px, env(safe-area-inset-left));
       background: var(--bg);
       color: var(--text);
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco,
         Consolas, "Liberation Mono", monospace;
       font-size: 13px;
+      -webkit-text-size-adjust: 100%;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .container {
       width: 100%;
       max-width: 440px;
+      max-height: 100%;
+      margin: 0 auto;
+      overflow: hidden;
     }
 
     .header {
-      margin-bottom: 22px;
+      margin: 0 0 20px;
       color: var(--green);
       font-size: 14px;
       overflow-wrap: anywhere;
     }
 
     .panel {
-      margin-bottom: 16px;
-      padding: 16px;
+      margin-bottom: 14px;
+      padding: 15px;
       border: 1px solid var(--border);
       border-radius: 8px;
       background: var(--panel);
     }
 
     .panel-title {
-      margin: 0 0 14px;
+      margin: 0 0 12px;
       color: var(--cyan);
       font-size: 12px;
       font-weight: 600;
@@ -71,7 +90,7 @@
     .ip-row {
       display: grid;
       grid-template-columns: 82px minmax(0, 1fr);
-      gap: 10px;
+      gap: 8px;
       align-items: start;
       padding: 9px 0;
       border-bottom: 1px solid var(--border);
@@ -84,6 +103,7 @@
 
     .ip-label {
       color: var(--muted);
+      white-space: nowrap;
     }
 
     .ip-value {
@@ -91,7 +111,7 @@
       max-width: 100%;
       color: var(--green);
       text-align: right;
-      line-height: 1.6;
+      line-height: 1.5;
       overflow-wrap: anywhere;
       word-break: break-word;
     }
@@ -106,50 +126,95 @@
 
     .links {
       display: grid;
-      gap: 10px;
+      gap: 9px;
     }
 
     .link {
       display: block;
-      padding: 12px 14px;
+      width: 100%;
+      padding: 12px;
       border: 1px solid var(--border);
       border-radius: 6px;
-      color: var(--cyan);
       background: var(--panel);
+      color: var(--cyan);
       text-decoration: none;
       overflow-wrap: anywhere;
       transition: border-color 0.2s, background 0.2s;
     }
 
-    .link:hover,
-    .link:focus-visible {
+    .link:focus-visible,
+    .link:hover {
       border-color: var(--cyan);
       background: #121c27;
+      outline: none;
     }
 
     .footer {
-      margin-top: 24px;
+      margin-top: 20px;
       color: var(--muted);
       font-size: 11px;
       text-align: center;
     }
 
+    /* Компактный режим для небольших экранов */
     @media (max-width: 360px) {
-      body {
-        padding: 18px 10px;
+      .header {
+        margin-bottom: 14px;
       }
 
       .panel {
-        padding: 12px;
+        margin-bottom: 10px;
+        padding: 11px;
       }
 
       .ip-row {
         grid-template-columns: 72px minmax(0, 1fr);
-        gap: 6px;
+        gap: 5px;
+        padding: 7px 0;
       }
 
       .ip-value {
         font-size: 10px;
+      }
+
+      .link {
+        padding: 10px;
+      }
+
+      .footer {
+        margin-top: 14px;
+      }
+    }
+
+    /* Компактный режим для экранов небольшой высоты */
+    @media (max-height: 600px) {
+      .header {
+        margin-bottom: 10px;
+      }
+
+      .panel {
+        margin-bottom: 9px;
+        padding: 10px;
+      }
+
+      .panel-title {
+        margin-bottom: 7px;
+      }
+
+      .ip-row {
+        padding: 6px 0;
+      }
+
+      .links {
+        gap: 7px;
+      }
+
+      .link {
+        padding: 9px 10px;
+      }
+
+      .footer {
+        margin-top: 10px;
       }
     }
 
@@ -170,7 +235,9 @@
     </header>
 
     <section class="panel" aria-labelledby="network-title">
-      <h2 class="panel-title" id="network-title">Network status</h2>
+      <h2 class="panel-title" id="network-title">
+        Network status
+      </h2>
 
       <div class="ip-row">
         <span class="ip-label">Global IP:</span>
@@ -201,9 +268,10 @@
         rel="noopener noreferrer"
       >[ Download Shadowrocket ]</a>
 
-      <a href="sub://https://t0u9h.github.io/config1.2.conf" class="link">
-        [ Add subscription ]
-      </a>
+      <a
+        class="link"
+        href="sub://https://t0u9h.github.io/config1.2.conf"
+      >[ Add subscription ]</a>
     </nav>
 
     <footer class="footer">
@@ -216,38 +284,39 @@
 
     const REQUEST_TIMEOUT = 7000;
 
-    const IP_SERVICES = {
-      global: {
+    const services = [
+      {
         url: "https://ipwho.is/",
         elementId: "global-ip",
         parse(data) {
           if (data.success === false || !isValidIP(data.ip)) {
-            throw new Error("Некорректный ответ сервиса");
+            throw new Error("Invalid response");
           }
 
-          return formatResult(data.ip, data.country || data.country_code);
+          return formatIP(
+            data.ip,
+            data.country || data.country_code
+          );
         }
       },
-
-      direct: {
+      {
         url: "https://api.ipgeo.ru/",
         elementId: "direct-ip",
         parse(data) {
           if (data.ok !== true || !isValidIP(data.ip)) {
-            throw new Error("Некорректный ответ сервиса");
+            throw new Error("Invalid response");
           }
 
-          return formatResult(data.ip, data.country);
+          return formatIP(data.ip, data.country);
         }
       }
-    };
+    ];
 
     function isValidIP(value) {
       if (typeof value !== "string") {
         return false;
       }
 
-      // Проверяем формат IPv4.
       const ipv4 =
         /^(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)$/;
 
@@ -255,9 +324,10 @@
         return true;
       }
 
-      // Базовая проверка IPv6.
-      // Дополнительно допускаем сокращённую запись ::.
-      if (!value.includes(":") || !/^[0-9a-f:.]+$/i.test(value)) {
+      if (
+        !value.includes(":") ||
+        !/^[0-9a-f:.]+$/i.test(value)
+      ) {
         return false;
       }
 
@@ -268,7 +338,7 @@
       }
     }
 
-    function formatResult(ip, country) {
+    function formatIP(ip, country) {
       const location =
         typeof country === "string" && country.trim()
           ? country.trim()
@@ -277,7 +347,7 @@
       return `${ip} (${location})`;
     }
 
-    async function fetchIP(service) {
+    async function loadIP(service) {
       const element = document.getElementById(service.elementId);
       const controller = new AbortController();
       const timeout = setTimeout(
@@ -318,12 +388,7 @@
       }
     }
 
-    function refreshIPs() {
-      fetchIP(IP_SERVICES.global);
-      fetchIP(IP_SERVICES.direct);
-    }
-
-    refreshIPs();
+    services.forEach(loadIP);
   </script>
 </body>
 </html>
