@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#080b10">
-  <meta name="description" content="Network status and Shadowrocket configuration">
+  <meta name="description" content="Статус сети и конфигурация Shadowrocket">
 
   <title>t0u9h@shadowrocket:~</title>
 
@@ -89,7 +89,7 @@
 
     .ip-row {
       display: grid;
-      grid-template-columns: 82px minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
       gap: 8px;
       align-items: start;
       padding: 9px 0;
@@ -102,8 +102,9 @@
     }
 
     .ip-label {
+      min-width: 0;
       color: var(--muted);
-      white-space: nowrap;
+      overflow-wrap: anywhere;
     }
 
     .ip-value {
@@ -167,11 +168,11 @@
       }
 
       .ip-row {
-        grid-template-columns: 72px minmax(0, 1fr);
-        gap: 5px;
+        gap: 6px;
         padding: 7px 0;
       }
 
+      .ip-label,
       .ip-value {
         font-size: 10px;
       }
@@ -234,11 +235,11 @@
 
     <section class="panel" aria-labelledby="network-title">
       <h2 class="panel-title" id="network-title">
-        Network status
+        Статус сети
       </h2>
 
       <div class="ip-row">
-        <span class="ip-label">Global IP:</span>
+        <span class="ip-label">Глобальный IP:</span>
         <span
           class="ip-value loading"
           id="global-ip"
@@ -248,7 +249,7 @@
       </div>
 
       <div class="ip-row">
-        <span class="ip-label">Direct IP:</span>
+        <span class="ip-label">Прямой IP:</span>
         <span
           class="ip-value loading"
           id="direct-ip"
