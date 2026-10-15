@@ -2,15 +2,6 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="
-      default-src 'self';
-      script-src 'self';
-      style-src 'self';
-      connect-src 'self' https://ipwho.is https://api.ipify.org https://suggestions.dadata.ru;
-      object-src 'none';
-      base-uri 'self';
-      frame-ancestors 'none';
-    ">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>shadowrocket // t0u9h</title>
     <style>
@@ -311,14 +302,12 @@
             const token = "754315cb97624ed87545c3721a1d3b0d376b4431";
 
             try {
-                // Сначала узнаем текущий прямой IP клиента через ipify
                 const ipRes = await fetch('https://api.ipify.org?format=json');
                 const ipData = await ipRes.json();
                 const clientIp = ipData.ip;
 
                 if (!clientIp) throw new Error("No IP");
 
-                // Запрос к DaData с вашим токеном и текущим IP
                 const url = "https://suggestions.dadata.ru/suggestions/api/4_1/rs/iplocate/address?ip=";
                 const options = {
                     method: "GET",
@@ -340,7 +329,6 @@
                 }
             } catch (e) {}
 
-            // Резервный фолбек на ipify, если DaData не ответила
             try {
                 const resFallback = await fetch('https://api.ipify.org?format=json');
                 const dataFallback = await resFallback.json();
