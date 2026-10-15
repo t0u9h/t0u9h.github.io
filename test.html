@@ -288,10 +288,10 @@
         async function fetchGlobalIP() {
             try {
                 const res = await fetch('https://ipwho.is/');
-                const data = await res.json();
-                if (data.success) {
-                    const flag = data.flag && data.flag.img ? `<img src="${data.flag.img}" class="flag-img" alt="flag"> ` : '';
-                    document.getElementById('global-ip').innerHTML = `${flag}${data.ip} (${data.country_code || ''})`;
+                const resData = await res.json();
+                if (resData.success) {
+                    const flag = resData.flag && resData.flag.img ? `<img src="${resData.flag.img}" class="flag-img" alt="flag"> ` : '';
+                    document.getElementById('global-ip').innerHTML = `${flag}${resData.ip} (${resData.country_code || ''})`;
                 } else {
                     document.getElementById('global-ip').textContent = 'failed';
                 }
@@ -300,20 +300,39 @@
             }
         }
 
-        // 2. RU IP via ipwhois.io (DIRECT)
+        // 2. RU IP via Enterno API v4 (DIRECT)
         async function fetchRuIP() {
             const el = document.getElementById('ru-ip');
+            const apiKey = 'ent_dd02bd27037e0d9ab94b7019665b9ff457251b9290227179';
+
             try {
-                const res = await fetch('https://ipwhois.io/json/');
-                const data = await res.json();
-                if (data.success) {
-                    el.textContent = data.ip + (data.country_code ? ` (${data.country_code})` : '');
-                } else {
-                    el.textContent = 'failed';
+                // Передаем ключ в URL-параметре, чтобы обойти CORS-ограничения браузера на заголовки
+                const res = await fetch(`https://enterno.io/api/v4/ip?key=${apiKey}`);
+                if (res.ok) {
+                    const json = await res.json();
+                    const payload = json.data || json;
+                    const ip = payload.ip || payload.query;
+                    if (ip) {
+                        el.textContent = ip;
+                        return;
+                    }
                 }
-            } catch (e) {
-                el.textContent = 'offline';
-            }
+            } catch (e) {}
+
+            // Фоллбек на открытый публичный роут без ключа
+            try {
+                const resOpen = await fetch('https://enterno.io/api/open/ip');
+                if (resOpen.ok) {
+                    const jsonOpen = await resOpen.json();
+                    const ipOpen = jsonOpen.ip || (jsonOpen.data && jsonOpen.data.ip) || jsonOpen.query;
+                    if (ipOpen) {
+                        el.textContent = ipOpen;
+                        return;
+                    }
+                }
+            } catch (e) {}
+
+            el.textContent = 'offline';
         }
 
         fetchGlobalIP();
