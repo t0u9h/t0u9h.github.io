@@ -106,13 +106,12 @@
       overflow-wrap: anywhere;
     }
 
-    /* Цвета IP-адресов под палитру */
     .ip-value-global {
-      color: #65d9ff; /* Неоново-голубой для Global IP */
+      color: #65d9ff;
     }
 
     .ip-value-direct {
-      color: #c084fc; /* Лавандово-фиолетовый для Direct IP */
+      color: #c084fc;
     }
 
     .country {
@@ -299,6 +298,18 @@
     const refreshButton = document.getElementById("refresh-button");
     const lastCheckElement = document.getElementById("last-check");
 
+    // Преобразование ISO-кода страны (RU, DE, US и т.д.) в Emoji-флаг
+    function getFlagEmoji(countryCode) {
+      if (!countryCode || typeof countryCode !== "string" || countryCode.length !== 2) {
+        return "🌍";
+      }
+      const codePoints = countryCode
+        .toUpperCase()
+        .split("")
+        .map((char) => 127397 + char.charCodeAt(0));
+      return String.fromCodePoint(...codePoints);
+    }
+
     async function fetchJson(url, timeout = 7000) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), timeout);
@@ -328,7 +339,8 @@
 
       return {
         ip: data.ip,
-        country: data.country || "Страна не определена"
+        country: data.country || "Страна не определена",
+        countryCode: data.country_code
       };
     }
 
@@ -337,17 +349,14 @@
 
       let ip;
       let country = "Страна не определена";
+      let countryCode = null;
 
       if (typeof data === "string") {
         ip = data.trim();
       } else {
         ip = data.ip || data.query || data.address;
-
-        country =
-          data.country ||
-          data.country_name ||
-          data.countryName ||
-          country;
+        country = data.country || data.country_name || data.countryName || country;
+        countryCode = data.country_code || data.countryCode || null;
       }
 
       if (!ip) {
@@ -356,7 +365,8 @@
 
       return {
         ip: ip,
-        country: country
+        country: country,
+        countryCode: countryCode
       };
     }
 
@@ -378,9 +388,10 @@
 
         if (results[0].status === "fulfilled") {
           const result = results[0].value;
+          const flag = getFlagEmoji(result.countryCode);
 
           globalIpElement.textContent = result.ip;
-          globalCountryElement.textContent = "🌍 " + result.country;
+          globalCountryElement.textContent = `${flag} ${result.country}`;
         } else {
           globalIpElement.textContent = "Недоступен";
           globalCountryElement.textContent = "Не удалось проверить";
@@ -388,9 +399,10 @@
 
         if (results[1].status === "fulfilled") {
           const result = results[1].value;
+          const flag = getFlagEmoji(result.countryCode);
 
           directIpElement.textContent = result.ip;
-          directCountryElement.textContent = "🌍 " + result.country;
+          directCountryElement.textContent = `${flag} ${result.country}`;
         } else {
           directIpElement.textContent = "Недоступен";
           directCountryElement.textContent = "Не удалось проверить";
