@@ -2,25 +2,11 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#080b10">
-  <meta name="description" content="Статус сети и конфигурация Shadowrocket">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080d0b">
   <title>t0u9h@shadowrocket:~</title>
 
   <style>
-    :root {
-      color-scheme: dark;
-      --bg: #080b10;
-      --panel: #0e131b;
-      --border: #202b38;
-      --text: #d6e2f0;
-      --muted: #8291a5;
-      --green: #64f5a2;
-      --cyan: #65d9ff;
-      --red: #ff7777;
-    }
-
     * {
       box-sizing: border-box;
     }
@@ -28,200 +14,128 @@
     html,
     body {
       width: 100%;
-      height: 100%;
+      min-height: 100%;
       margin: 0;
-      padding: 0;
-      overflow: hidden;
-      overscroll-behavior: none;
     }
 
     body {
-      position: fixed;
-      inset: 0;
+      background: #080d0b;
+      color: #b8ffd2;
+      font-family: monospace;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding:
-        max(12px, env(safe-area-inset-top))
-        max(12px, env(safe-area-inset-right))
-        max(12px, env(safe-area-inset-bottom))
-        max(12px, env(safe-area-inset-left));
-      background: var(--bg);
-      color: var(--text);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco,
-        Consolas, "Liberation Mono", monospace;
-      font-size: 13px;
-      -webkit-text-size-adjust: 100%;
-      -webkit-tap-highlight-color: transparent;
+      padding: 20px;
     }
 
     .container {
       width: 100%;
       max-width: 440px;
-      max-height: 100%;
-      margin: 0 auto;
-      overflow: hidden;
+      border: 1px solid #174b35;
+      border-radius: 12px;
+      padding: 24px;
+      background: #0b120e;
+      box-shadow: 0 0 25px rgba(0, 255, 128, 0.06);
     }
 
-    .header {
-      margin: 0 0 20px;
-      color: var(--green);
-      font-size: 14px;
+    .title {
+      color: #43ff9a;
+      font-size: 20px;
+      margin: 0 0 24px;
       overflow-wrap: anywhere;
     }
 
-    .panel {
-      margin-bottom: 14px;
-      padding: 15px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--panel);
+    .section-title {
+      color: #43ff9a;
+      font-size: 15px;
+      margin: 0 0 16px;
     }
 
-    .panel-title {
-      margin: 0 0 12px;
-      color: var(--cyan);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
+    .status-box {
+      border: 1px solid #174b35;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
     }
 
     .ip-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
-      gap: 8px;
-      align-items: start;
-      padding: 9px 0;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .ip-row:last-child {
-      padding-bottom: 0;
-      border-bottom: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin: 12px 0;
+      font-size: 13px;
     }
 
     .ip-label {
-      min-width: 0;
-      color: var(--muted);
-      overflow-wrap: anywhere;
+      color: #86b99b;
+      flex-shrink: 0;
     }
 
     .ip-value {
-      min-width: 0;
-      max-width: 100%;
-      color: var(--green);
+      color: #65caff;
       text-align: right;
-      line-height: 1.5;
       overflow-wrap: anywhere;
-      word-break: break-word;
     }
 
-    .ip-value.loading {
-      color: var(--muted);
-    }
-
-    .ip-value.error {
-      color: var(--red);
-    }
-
-    .links {
-      display: grid;
-      gap: 9px;
-    }
-
-    .link {
+    .refresh-button,
+    .action-button {
       display: block;
       width: 100%;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background: var(--panel);
-      color: var(--cyan);
+      padding: 13px;
+      border: 1px solid #23774d;
+      border-radius: 7px;
+      background: #10271a;
+      color: #65ffad;
+      font-family: monospace;
+      font-size: 14px;
+      text-align: center;
       text-decoration: none;
-      overflow-wrap: anywhere;
-      transition: border-color 0.2s, background 0.2s;
+      cursor: pointer;
+      transition: background 0.2s, border-color 0.2s;
     }
 
-    .link:hover,
-    .link:focus-visible {
-      border-color: var(--cyan);
-      background: #121c27;
-      outline: none;
+    .refresh-button:hover,
+    .action-button:hover {
+      background: #173b26;
+      border-color: #43ff9a;
     }
 
-    .footer {
-      margin-top: 20px;
-      color: var(--muted);
+    .refresh-button:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .last-check {
+      color: #668774;
       font-size: 11px;
       text-align: center;
+      margin: 12px 0 0;
+    }
+
+    .actions {
+      display: grid;
+      gap: 12px;
+    }
+
+    footer {
+      color: #426d53;
+      text-align: center;
+      font-size: 11px;
+      margin-top: 24px;
     }
 
     @media (max-width: 360px) {
-      .header {
-        margin-bottom: 14px;
+      .container {
+        padding: 16px;
       }
 
-      .panel {
-        margin-bottom: 10px;
-        padding: 11px;
-      }
-
-      .ip-row {
-        gap: 6px;
-        padding: 7px 0;
-      }
-
-      .ip-label,
-      .ip-value {
-        font-size: 10px;
-      }
-
-      .link {
-        padding: 10px;
-      }
-
-      .footer {
-        margin-top: 14px;
-      }
-    }
-
-    @media (max-height: 600px) {
-      .header {
-        margin-bottom: 10px;
-      }
-
-      .panel {
-        margin-bottom: 9px;
-        padding: 10px;
-      }
-
-      .panel-title {
-        margin-bottom: 7px;
+      .title {
+        font-size: 17px;
       }
 
       .ip-row {
-        padding: 6px 0;
-      }
-
-      .links {
-        gap: 7px;
-      }
-
-      .link {
-        padding: 9px 10px;
-      }
-
-      .footer {
-        margin-top: 10px;
-      }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      *,
-      *::before,
-      *::after {
-        transition: none !important;
+        font-size: 12px;
       }
     }
   </style>
@@ -229,168 +143,141 @@
 
 <body>
   <main class="container">
-    <header class="header">
-      t0u9h@shadowrocket:~
-    </header>
+    <h1 class="title">t0u9h@shadowrocket:~</h1>
 
-    <section class="panel" aria-labelledby="network-title">
-      <h2 class="panel-title" id="network-title">
-        Статус сети
-      </h2>
+    <section class="status-box">
+      <h2 class="section-title">Статус сети</h2>
 
       <div class="ip-row">
         <span class="ip-label">Глобальный IP:</span>
-        <span
-          class="ip-value loading"
-          id="global-ip"
-          role="status"
-          aria-live="polite"
-        >Загрузка...</span>
+        <span class="ip-value" id="global-ip">Проверка...</span>
       </div>
 
       <div class="ip-row">
         <span class="ip-label">Прямой IP:</span>
-        <span
-          class="ip-value loading"
-          id="direct-ip"
-          role="status"
-          aria-live="polite"
-        >Загрузка...</span>
+        <span class="ip-value" id="direct-ip">Проверка...</span>
       </div>
+
+      <button class="refresh-button" id="refresh-button" type="button">
+        ↻ Обновить данные
+      </button>
+
+      <p class="last-check" id="last-check">
+        Последняя проверка: ещё не выполнялась
+      </p>
     </section>
 
-    <nav class="links" aria-label="Основные действия">
+    <div class="actions">
       <a
-        class="link"
+        class="action-button"
         href="https://apps.apple.com/ru/app/shadowrocket/id932747118"
-        target="_blank"
-        rel="noopener noreferrer"
-      >1. Установить shadowrocket</a>
+      >
+        1. Установить Shadowrocket
+      </a>
 
       <a
-        class="link"
+        class="action-button"
         href="sub://https://t0u9h.github.io/config1.2.conf"
-      >2. Добавить файл конфигурации</a>
-    </nav>
+      >
+        2. Добавить файл конфигурации
+      </a>
+    </div>
 
-    <footer class="footer">
-      © by t0u9h
-    </footer>
+    <footer>© by t0u9h</footer>
   </main>
 
   <script>
-    "use strict";
+    const globalIpElement = document.getElementById("global-ip");
+    const directIpElement = document.getElementById("direct-ip");
+    const refreshButton = document.getElementById("refresh-button");
+    const lastCheckElement = document.getElementById("last-check");
 
-    const REQUEST_TIMEOUT = 7000;
-
-    const services = [
-      {
-        url: "https://ipwho.is/",
-        elementId: "global-ip",
-
-        parse(data) {
-          if (data.success === false || !isValidIP(data.ip)) {
-            throw new Error("Invalid response");
-          }
-
-          return formatIP(
-            data.ip,
-            data.country || data.country_code
-          );
-        }
-      },
-      {
-        url: "https://api.ipgeo.ru/",
-        elementId: "direct-ip",
-
-        parse(data) {
-          if (data.ok !== true || !isValidIP(data.ip)) {
-            throw new Error("Invalid response");
-          }
-
-          return formatIP(data.ip, data.country);
-        }
-      }
-    ];
-
-    function isValidIP(value) {
-      if (typeof value !== "string") {
-        return false;
-      }
-
-      const ipv4 =
-        /^(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)$/;
-
-      if (ipv4.test(value)) {
-        return true;
-      }
-
-      if (
-        !value.includes(":") ||
-        !/^[0-9a-f:.]+$/i.test(value)
-      ) {
-        return false;
-      }
-
-      try {
-        return new URL(`http://[${value}]/`).hostname.length > 0;
-      } catch {
-        return false;
-      }
-    }
-
-    function formatIP(ip, country) {
-      const location =
-        typeof country === "string" && country.trim()
-          ? country.trim()
-          : "страна не определена";
-
-      return `${ip} (${location})`;
-    }
-
-    async function loadIP(service) {
-      const element = document.getElementById(service.elementId);
+    async function fetchWithTimeout(url, timeout = 7000) {
       const controller = new AbortController();
-
-      const timeout = setTimeout(
-        () => controller.abort(),
-        REQUEST_TIMEOUT
-      );
-
-      element.classList.remove("error");
-      element.classList.add("loading");
-      element.textContent = "Загрузка...";
+      const timer = setTimeout(() => controller.abort(), timeout);
 
       try {
-        const response = await fetch(service.url, {
-          method: "GET",
+        return await fetch(url, {
           cache: "no-store",
-          signal: controller.signal,
-          headers: {
-            Accept: "application/json"
-          }
+          signal: controller.signal
         });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        const data = await response.json();
-        element.textContent = service.parse(data);
-      } catch (error) {
-        element.textContent =
-          error.name === "AbortError"
-            ? "Время ожидания истекло"
-            : "Недоступно";
-
-        element.classList.add("error");
       } finally {
-        clearTimeout(timeout);
-        element.classList.remove("loading");
+        clearTimeout(timer);
       }
     }
 
-    services.forEach(loadIP);
+    async function getGlobalIp() {
+      const response = await fetchWithTimeout("https://ipwho.is/");
+
+      if (!response.ok) {
+        throw new Error("Не удалось получить данные");
+      }
+
+      const data = await response.json();
+
+      if (!data.success || !data.ip) {
+        throw new Error("IP не найден");
+      }
+
+      return data.ip;
+    }
+
+    async function getDirectIp() {
+      const response = await fetchWithTimeout("https://api.ipgeo.ru/");
+
+      if (!response.ok) {
+        throw new Error("Не удалось получить данные");
+      }
+
+      const data = await response.json();
+
+      if (typeof data === "string") {
+        return data.trim();
+      }
+
+      const ip = data.ip || data.query || data.address;
+
+      if (!ip) {
+        throw new Error("IP не найден");
+      }
+
+      return ip;
+    }
+
+    async function updateData() {
+      refreshButton.disabled = true;
+      refreshButton.textContent = "⟳ Проверка...";
+      globalIpElement.textContent = "Проверка...";
+      directIpElement.textContent = "Проверка...";
+
+      try {
+        const results = await Promise.allSettled([
+          getGlobalIp(),
+          getDirectIp()
+        ]);
+
+        globalIpElement.textContent =
+          results[0].status === "fulfilled"
+            ? results[0].value
+            : "Недоступен";
+
+        directIpElement.textContent =
+          results[1].status === "fulfilled"
+            ? results[1].value
+            : "Недоступен";
+
+        lastCheckElement.textContent =
+          "Последняя проверка: " +
+          new Date().toLocaleTimeString("ru-RU");
+      } finally {
+        refreshButton.disabled = false;
+        refreshButton.textContent = "↻ Обновить данные";
+      }
+    }
+
+    refreshButton.addEventListener("click", updateData);
+
+    updateData();
   </script>
 </body>
 </html>
