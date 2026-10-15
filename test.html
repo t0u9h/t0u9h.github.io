@@ -330,6 +330,7 @@
       }
     }
 
+    // Глобальный IP через ipwho.is
     async function getGlobalIp() {
       const data = await fetchJson("https://ipwho.is/");
 
@@ -344,29 +345,18 @@
       };
     }
 
+    // Прямой IP через российский сервис ipapi.ipgeo.ru
     async function getDirectIp() {
-      const data = await fetchJson("https://api.ipgeo.ru/");
+      const data = await fetchJson("https://ipapi.ipgeo.ru/json/");
 
-      let ip;
-      let country = "Страна не определена";
-      let countryCode = null;
-
-      if (typeof data === "string") {
-        ip = data.trim();
-      } else {
-        ip = data.ip || data.query || data.address;
-        country = data.country || data.country_name || data.countryName || country;
-        countryCode = data.country_code || data.countryCode || null;
-      }
-
-      if (!ip) {
+      if (!data || !data.ip) {
         throw new Error("Прямой IP не найден");
       }
 
       return {
-        ip: ip,
-        country: country,
-        countryCode: countryCode
+        ip: data.ip,
+        country: data.country || data.country_name || "Россия",
+        countryCode: data.country_code || data.countryCode || "RU"
       };
     }
 
