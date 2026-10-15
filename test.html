@@ -300,39 +300,43 @@
             }
         }
 
-        // 2. RU IP via enterno.io (DIRECT)
+        // 2. RU IP via Enterno API v4 (DIRECT)
         async function fetchRuIP() {
             const el = document.getElementById('ru-ip');
             const apiKey = 'ent_dd02bd27037e0d9ab94b7019665b9ff457251b9290227179';
 
-            // Попытка 1: Через API v4 с заголовком X-API-Key
             try {
-                const res = await fetch('https://enterno.io/api/v4/ip', {
+                const response = await fetch('https://enterno.io/api/v4/ip', {
                     method: 'GET',
                     headers: {
                         'X-API-Key': apiKey,
                         'Accept': 'application/json'
                     }
                 });
-                
-                if (res.ok) {
-                    const json = await res.json();
-                    const ip = (json.data && json.data.ip) || json.ip || json.query;
-                    if (ip) {
-                        el.textContent = ip;
-                        return;
-                    }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const json = await response.json();
+                // Достаем IP из структуры v4 (json.data.ip или общие поля)
+                const payload = json.data || json;
+                const ip = payload.ip || payload.query;
+
+                if (ip) {
+                    el.textContent = ip;
+                    return;
                 }
             } catch (e) {}
 
-            // Попытка 2: Фолбек на открытый публичный роут без ключа
+            // Фолбек на открытый публичный роут Enterno, если v4 недоступен
             try {
-                const res = await fetch('https://enterno.io/api/open/ip');
-                if (res.ok) {
-                    const json = await res.json();
-                    const ip = json.ip || (json.data && json.data.ip) || json.query;
-                    if (ip) {
-                        el.textContent = ip;
+                const resOpen = await fetch('https://enterno.io/api/open/ip');
+                if (resOpen.ok) {
+                    const jsonOpen = await resOpen.json();
+                    const ipOpen = jsonOpen.ip || (jsonOpen.data && jsonOpen.data.ip) || jsonOpen.query;
+                    if (ipOpen) {
+                        el.textContent = ipOpen;
                         return;
                     }
                 }
