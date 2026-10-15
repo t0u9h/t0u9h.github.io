@@ -318,7 +318,6 @@
       }
     }
 
-    // Глобальный IP через ipwho.is
     async function getGlobalIp() {
       const data = await fetchJson("https://ipwho.is/");
 
@@ -332,7 +331,6 @@
       };
     }
 
-    // Прямой IP через российский сервис ipapi.ipgeo.ru
     async function getDirectIp() {
       const data = await fetchJson("https://ipapi.ipgeo.ru/json/");
 
