@@ -284,7 +284,7 @@
             e.preventDefault();
         }, { passive: false });
 
-        // 1. Global IP (ipwho.is -> PROXY)
+        // 1. Global IP via ipwho.is (PROXY)
         async function fetchGlobalIP() {
             try {
                 const res = await fetch('https://ipwho.is/');
@@ -300,10 +300,14 @@
             }
         }
 
-        // 2. RU IP (enterno.io/api/v4/ip -> DIRECT)
+        // 2. RU IP via enterno.io/api/v4/ip (DIRECT)
         async function fetchRuIP() {
             try {
-                const res = await fetch('https://enterno.io/api/v4/ip');
+                const res = await fetch('https://enterno.io/api/v4/ip', {
+                    headers: {
+                        'X-API-Key': 'ent_dd02bd27037e0d9ab94b7019665b9ff457251b9290227179'
+                    }
+                });
                 const data = await res.json();
                 if (data && (data.ip || data.query)) {
                     document.getElementById('ru-ip').textContent = data.ip || data.query;
