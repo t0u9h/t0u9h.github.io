@@ -35,7 +35,7 @@
       width: 100%;
       max-width: 440px;
       max-height: 100%;
-      overflow: auto;
+      overflow-y: auto;
       scrollbar-width: none;
       border: 1px solid #174b35;
       border-radius: 12px;
@@ -246,11 +246,12 @@
       }
     }
 
+    // Глобальный IP и страна
     async function getGlobalIp() {
       const data = await fetchJson("https://ipwho.is/");
 
       if (!data.success || !data.ip) {
-        throw new Error("IP недоступен");
+        throw new Error("Глобальный IP недоступен");
       }
 
       return {
@@ -259,16 +260,21 @@
       };
     }
 
+    // Прямой IP через отдельный сервис
     async function getDirectIp() {
-      const data = await fetchJson("https://ipwho.is/");
+      const data = await fetchJson("https://api.ipgeo.ru/");
 
-      if (!data.success || !data.ip) {
-        throw new Error("IP недоступен");
+      const ip = typeof data === "string"
+        ? data.trim()
+        : data.ip || data.query || data.address;
+
+      if (!ip) {
+        throw new Error("Прямой IP не найден");
       }
 
       return {
-        ip: data.ip,
-        country: data.country || "Страна не определена"
+        ip: ip,
+        country: data.country || data.country_name || "Страна не определена"
       };
     }
 
@@ -293,6 +299,7 @@
             "🌍 " + results[0].value.country;
         } else {
           globalIpElement.textContent = "Недоступен";
+          globalCountryElement.textContent = "";
         }
 
         if (results[1].status === "fulfilled") {
@@ -301,6 +308,7 @@
             "🌍 " + results[1].value.country;
         } else {
           directIpElement.textContent = "Недоступен";
+          directCountryElement.textContent = "";
         }
 
         lastCheckElement.textContent =
